@@ -440,17 +440,27 @@ async function loadData() {
     document.getElementById('lastUpd').textContent=new Date().toLocaleDateString('ko-KR');
     renderAllCharts(); return;
   }
-  try {
-    const res=await fetch(APPS_SCRIPT_URL, {redirect: 'follow'});
-    RAW=await res.json(); FILTERED=[...RAW];
-    document.getElementById('dataStatus').textContent=`${RAW.length.toLocaleString()}행 로드 완료`;
-    document.getElementById('lastUpd').textContent=new Date().toLocaleString('ko-KR');
+ try {
+    await new Promise((resolve, reject) => {
+      const callbackName = 'cb_' + Date.now();
+      window[callbackName] = function(data) {
+        RAW = data;
+        FILTERED = [...RAW];
+        delete window[callbackName];
+        document.getElementById('dataStatus').textContent=`${RAW.length.toLocaleString()}행 로드 완료`;
+        document.getElementById('lastUpd').textContent=new Date().toLocaleString('ko-KR');
+        resolve();
+      };
+      const script = document.createElement('script');
+      script.src = APPS_SCRIPT_URL + '?callback=' + callbackName;
+      script.onerror = reject;
+      document.head.appendChild(script);
+    });
     renderAllCharts();
   } catch(e) {
     document.getElementById('dataStatus').textContent='연동 오류 — 샘플 데이터 사용 중';
     renderAllCharts();
   }
-}
 
 // ── 공통 옵션 ─────────────────────────────────────────────────────
 Chart.register(ChartDataLabels);
