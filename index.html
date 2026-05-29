@@ -320,11 +320,11 @@ const MONTHS=['1월','2월','3월','4월','5월'];
 const MGRS5=['고의준','조용빈','박철용','이병현','김시연'];
 const C={blue:'#4472C4',red:'#ED7D31',green:'#70AD47',yellow:'#FFC000',teal:'#5BC0BE',gray:'#A5A5A5',navy:'#264478',blueA:'rgba(68,114,196,0.75)',redA:'rgba(237,125,49,0.75)',greenA:'rgba(112,173,71,0.75)',yellowA:'rgba(255,192,0,0.75)',tealA:'rgba(91,192,190,0.75)',grayA:'rgba(165,165,165,0.5)'};
 
-function dlMixed(lc){return{display:ctx=>{if(ctx.dataset.type==='line')return ctx.parsed.y>0;return ctx.parsed.y>0;},formatter:(v,ctx)=>{if(ctx.dataset.type==='line')return v+'%';return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'k':v;},color:ctx=>ctx.dataset.type==='line'?(lc||C.yellow):'#fff',font:{size:8,weight:'600',family:"'JetBrains Mono',monospace"},anchor:ctx=>ctx.dataset.type==='line'?'end':'center',align:ctx=>ctx.dataset.type==='line'?'top':'center',offset:2,clamp:true};}
+function dlMixed(lc){return{display:ctx=>{if(!ctx.parsed||ctx.parsed.y===undefined)return false;if(ctx.dataset.type==='line')return ctx.parsed.y>0;return ctx.parsed.y>0;},formatter:(v,ctx)=>{if(ctx.dataset.type==='line')return v+'%';return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'k':v;},color:ctx=>ctx.dataset.type==='line'?(lc||C.yellow):'#fff',font:{size:8,weight:'600',family:"'JetBrains Mono',monospace"},anchor:ctx=>ctx.dataset.type==='line'?'end':'center',align:ctx=>ctx.dataset.type==='line'?'top':'center',offset:2,clamp:true};}
 function dualAxis(yL,y2L){return{y:{position:'left',grid:gridOpt,ticks:{...tickOpt,font:monoFont},title:{display:true,text:yL||'건수',color:'#94a3b8',font:{size:9}}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,font:monoFont,callback:v=>v+'%'},title:{display:true,text:y2L||'전환율',color:C.yellow,font:{size:9}}}};}
 function dualAxisRev(){return{y:{position:'left',grid:gridOpt,ticks:{...tickOpt,font:monoFont,callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,font:monoFont,callback:v=>v+'%'}}}}
 const CI={};
-function mc(id,cfg){if(CI[id])CI[id].destroy();const el=document.getElementById(id);if(!el)return;CI[id]=new Chart(el.getContext('2d'),cfg);}
+function mc(id,cfg){if(CI[id]){CI[id].destroy();CI[id]=null;}const el=document.getElementById(id);if(!el)return;try{CI[id]=new Chart(el.getContext('2d'),cfg);}catch(e){Chart.getChart(el)?.destroy();CI[id]=new Chart(el.getContext('2d'),cfg);}}
 
 function renderWeekly(){
   const oC=[40,176,54,194,57,31,27,6,7,3,38,15,7,13,5,29,16,15,86,332,202,119];
