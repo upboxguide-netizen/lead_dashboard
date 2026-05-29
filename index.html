@@ -435,7 +435,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpvF_bPc-wET-o
 let RAW=[], FILTERED=[];
 async function loadData() {
   document.getElementById('dataStatus').textContent='데이터 로딩 중...';
-  if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL'){
+  if(APPS_SCRIPT_URL==='https://script.google.com/macros/s/AKfycbzpvF_bPc-wET-orrhz4BLV75bXEoz0ngbu-2q2qnz62uAxhv0kbAGpIcWfpr5Egm6STA/exec'){
     document.getElementById('dataStatus').textContent='시연 모드 (샘플 데이터)';
     document.getElementById('lastUpd').textContent=new Date().toLocaleDateString('ko-KR');
     renderAllCharts(); return;
