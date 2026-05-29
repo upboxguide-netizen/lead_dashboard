@@ -311,6 +311,8 @@ function updateKPI(){
 Chart.register(ChartDataLabels);
 Chart.defaults.font.family="'Noto Sans KR',sans-serif";
 Chart.defaults.font.size=10;
+// 전역 datalabels 기본값: 안전하게 false로 설정 후 각 차트에서 override
+Chart.defaults.plugins.datalabels = { display: false };
 Chart.defaults.color='#64748b';
 const gridOpt={color:'rgba(228,232,239,0.6)',drawBorder:false};
 const tickOpt={color:'#94a3b8',font:{size:10}};
@@ -320,7 +322,7 @@ const MONTHS=['1월','2월','3월','4월','5월'];
 const MGRS5=['고의준','조용빈','박철용','이병현','김시연'];
 const C={blue:'#4472C4',red:'#ED7D31',green:'#70AD47',yellow:'#FFC000',teal:'#5BC0BE',gray:'#A5A5A5',navy:'#264478',blueA:'rgba(68,114,196,0.75)',redA:'rgba(237,125,49,0.75)',greenA:'rgba(112,173,71,0.75)',yellowA:'rgba(255,192,0,0.75)',tealA:'rgba(91,192,190,0.75)',grayA:'rgba(165,165,165,0.5)'};
 
-function dlMixed(lc){return{display:ctx=>{try{if(!ctx.parsed||ctx.parsed.y===null||ctx.parsed.y===undefined)return false;if(ctx.dataset.type==='line')return ctx.parsed.y>0;return ctx.parsed.y>0;}catch(e){return false;}},formatter:(v,ctx)=>{if(ctx.dataset.type==='line')return v+'%';return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'k':v;},color:ctx=>ctx.dataset.type==='line'?(lc||C.yellow):'#fff',font:{size:8,weight:'600',family:"'JetBrains Mono',monospace"},anchor:ctx=>ctx.dataset.type==='line'?'end':'center',align:ctx=>ctx.dataset.type==='line'?'top':'center',offset:2,clamp:true};}
+function dlMixed(lc){return{display:function(ctx){try{var p=ctx.parsed;if(!p||p.y===null||p.y===undefined||isNaN(p.y))return false;if(ctx.dataset.type==='line')return p.y>0;return p.y>0;}catch(e){return false;}},formatter:(v,ctx)=>{if(ctx.dataset.type==='line')return v+'%';return v>=1e6?(v/1e6).toFixed(1)+'M':v>=1e3?(v/1e3).toFixed(0)+'k':v;},color:ctx=>ctx.dataset.type==='line'?(lc||C.yellow):'#fff',font:{size:8,weight:'600',family:"'JetBrains Mono',monospace"},anchor:ctx=>ctx.dataset.type==='line'?'end':'center',align:ctx=>ctx.dataset.type==='line'?'top':'center',offset:2,clamp:true};}
 function dualAxis(yL,y2L){return{y:{position:'left',grid:gridOpt,ticks:{...tickOpt,font:monoFont},title:{display:true,text:yL||'건수',color:'#94a3b8',font:{size:9}}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,font:monoFont,callback:v=>v+'%'},title:{display:true,text:y2L||'전환율',color:C.yellow,font:{size:9}}}};}
 function dualAxisRev(){return{y:{position:'left',grid:gridOpt,ticks:{...tickOpt,font:monoFont,callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,font:monoFont,callback:v=>v+'%'}}}}
 const CI={};
@@ -381,7 +383,7 @@ function renderLeadType(){
 
 function renderRetap(){
   const w7=['11일경과','14일경과','15일경과','16일경과','17일경과','18일경과','20일경과','22일경과'];
-  const ro={responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:10}},datalabels:{display:ctx=>ctx.parsed.y>0,formatter:v=>v,color:'#fff',font:{size:9,weight:'700'},anchor:'center',align:'center'}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{grid:gridOpt,ticks:{...tickOpt,font:monoFont}}}};
+  const ro={responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:10}},datalabels:{display:function(ctx){try{var p=ctx.parsed;return p&&p.y!==undefined&&p.y!==null&&!isNaN(p.y)&&p.y>0;}catch(e){return false;}},formatter:v=>v,color:'#fff',font:{size:9,weight:'700'},anchor:'center',align:'center'}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{grid:gridOpt,ticks:{...tickOpt,font:monoFont}}}};
   mc('chartRetap7Mgr',{type:'bar',data:{labels:w7,datasets:[{label:'고의준',data:[3,0,0,0,0,0,3,0],backgroundColor:C.blue,borderRadius:3},{label:'박철용',data:[0,0,1,4,1,0,1,2],backgroundColor:C.green,borderRadius:3},{label:'조용빈',data:[3,0,3,0,0,0,3,2],backgroundColor:C.teal,borderRadius:3}]},options:ro});
   mc('chartRetap7State',{type:'bar',data:{labels:w7,datasets:[{label:'계약성사',data:[0,0,0,0,1,0,0,0],backgroundColor:C.yellow,borderRadius:3},{label:'단순방문',data:[3,0,1,1,0,1,3,0],backgroundColor:C.blue,borderRadius:3},{label:'유효리드',data:[3,3,3,3,0,0,3,2],backgroundColor:C.green,borderRadius:3}]},options:ro});
   const w14=['14일경과','15일경과','16일경과','17일경과','18일경과','20일경과','22일경과'];
