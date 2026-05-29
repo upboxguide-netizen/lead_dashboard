@@ -8,7 +8,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 
 <style>
-:root{--bg:#f0f2f5;--bg2:#ffffff;--bg3:#f7f8fa;--card:#ffffff;--border:#e4e8ef;--sidebar:#0d1b2a;--sidebar3:#1e2d40;--blue:#4472C4;--red:#ED7D31;--green:#70AD47;--yellow:#FFC000;--teal:#5BC0BE;--gray:#A5A5A5;--navy:#264478;--text:#1a2332;--text2:#4a5568;--text3:#94a3b8;--mono:'JetBrains Mono',monospace;--sans:'Noto Sans KR',sans-serif;--shadow:0 1px 4px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.04);--shadow2:0 2px 8px rgba(0,0,0,0.12);}
+:root{--bg:#f0f2f5;--bg2:#ffffff;--bg3:#f7f8fa;--card:#ffffff;--border:#e4e8ef;--sidebar:#0d1b2a;--sidebar3:#1e2d40;--blue:#4472C4;--red:#ED7D31;--green:#70AD47;--yellow:#FFC000;--teal:#5BC0BE;--gray:#A5A5A5;--navy:#264478;--text:#1a2332;--text2:#4a5568;--text3:#94a3b8;--mono:'Noto Sans KR',sans-serif;--sans:'Noto Sans KR',sans-serif;--shadow:0 1px 4px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.04);--shadow2:0 2px 8px rgba(0,0,0,0.12);}
 *{margin:0;padding:0;box-sizing:border-box;}
 body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:100vh;display:flex;}
 .sidebar{width:220px;min-height:100vh;background:var(--sidebar);display:flex;flex-direction:column;position:fixed;left:0;top:0;bottom:0;z-index:200;overflow-y:auto;}
@@ -125,7 +125,7 @@ body{background:var(--bg);color:var(--text);font-family:var(--sans);min-height:1
     <button class="tbtn refresh" onclick="loadData()">↻ 새로고침</button>
   </div>
   <div class="content">
-    <div class="data-note"><div class="pulse"></div><strong>Google Sheets 연동 중</strong>&nbsp;— 데이터를 불러오는 중입니다. 잠시만 기다려주세요.</div>
+    <div class="data-note" id="dataBanner"><div class="pulse" id="dataPulse"></div><span id="dataBannerText"><strong>Google Sheets 연동 중</strong>&nbsp;— 데이터를 불러오는 중입니다. 잠시만 기다려주세요.</span></div>
     <div id="overview"></div>
     <div class="sec-hd"><div class="sec-dot"></div><div class="sec-title">2026년 세일즈맵 도입 이후 리드 현황 (26.05.01~)</div></div>
     <div class="kpi-grid">
@@ -298,6 +298,12 @@ async function loadData(){
 }
 
 function updateKPI(){
+  const banner = document.getElementById('dataBannerText');
+  const pulse = document.getElementById('dataPulse');
+  const bannerEl = document.getElementById('dataBanner');
+  if(banner){ banner.innerHTML = '<strong>Google Sheets 연동 완료</strong>&nbsp;— 실시간 데이터가 반영됩니다.'; }
+  if(pulse){ pulse.style.background='#22c55e'; }
+  if(bannerEl){ bannerEl.style.background='#f0fdf4'; bannerEl.style.borderColor='#bbf7d0'; bannerEl.style.color='#15803d'; }
   const total=RAW.length;
   const ing=RAW.filter(r=>r['최종결과  테스트 외 비대상 표기 금지']===''||r['최종결과  테스트 외 비대상 표기 금지']==='진행중').length;
   const win=RAW.filter(r=>r['계약 성사여부 (참고)']==='계약성사').length;
@@ -316,7 +322,7 @@ Chart.defaults.font.size=10;
 Chart.defaults.color='#64748b';
 const gridOpt={color:'rgba(228,232,239,0.6)',drawBorder:false};
 const tickOpt={color:'#94a3b8',font:{size:10}};
-const monoFont={family:"'JetBrains Mono',monospace",size:10};
+const monoFont={family:"'Noto Sans KR',sans-serif",size:10};
 const WEEKS=['1','2','3','4','5','6','7','8','9','10','11','12','13','14','15','16','17','18','19','20','21','22'];
 const MONTHS=['1월','2월','3월','4월','5월'];
 const MGRS5=['고의준','조용빈','박철용','이병현','김시연'];
@@ -324,7 +330,7 @@ const C={blue:'#4472C4',red:'#ED7D31',green:'#70AD47',yellow:'#FFC000',teal:'#5B
 
 
 function dualAxis(yL,y2L){return{y:{position:'left',grid:gridOpt,ticks:{...tickOpt,font:monoFont},title:{display:true,text:yL||'건수',color:'#94a3b8',font:{size:9}}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,font:monoFont,callback:v=>v+'%'},title:{display:true,text:y2L||'전환율',color:C.yellow,font:{size:9}}}};}
-function dualAxisRev(){return{y:{position:'left',grid:gridOpt,ticks:{...tickOpt,font:monoFont,callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,font:monoFont,callback:v=>v+'%'}}}}
+function dualAxisRev(){return{y:{position:'left',grid:gridOpt,ticks:{...tickOpt,font:monoFont,callback:v=>v.toLocaleString('ko-KR')+'원'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,font:monoFont,callback:v=>v+'%'}}}}
 const CI={};
 function mc(id,cfg){
   if(CI[id]){CI[id].destroy();CI[id]=null;}
@@ -340,7 +346,7 @@ function renderWeekly(){
   const iC=[0,0,0,3,2,19,9,0,4,2,13,6,11,5,12,7,8,7,5,8,8,2];
   const oR=[13462075,56427125,1595520,24784535,18188155,8268500,10217500,2538500,2527500,1440000,17894500,7573000,2619500,3930250,2630000,15372500,6976100,4042000,10674350,16006001,5641350,6268000];
   const iR=[0,0,0,846000,128000,7321500,2546500,0,1156000,509250,3769500,1360000,3975250,1945000,4431000,2222500,2309500,2015000,1870000,2419000,931500,487500];
-  mc('chartWeekly',{type:'bar',data:{labels:WEEKS,datasets:[{label:'아웃바운드/건',data:oC,backgroundColor:C.blueA,borderRadius:3,yAxisID:'y'},{label:'인바운드/건',data:iC,backgroundColor:C.redA,borderRadius:3,yAxisID:'y'},{label:'아웃바운드/매출',data:oR,backgroundColor:C.yellowA,borderRadius:3,yAxisID:'y1',hidden:true},{label:'인바운드/매출',data:iR,backgroundColor:C.greenA,borderRadius:3,yAxisID:'y1',hidden:true}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:12}}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{position:'left',grid:gridOpt,ticks:tickOpt},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,callback:v=>v>=1e6?(v/1e6).toFixed(1)+'M':v}}}}});
+  mc('chartWeekly',{type:'bar',data:{labels:WEEKS,datasets:[{label:'아웃바운드/건',data:oC,backgroundColor:C.blueA,borderRadius:3,yAxisID:'y'},{label:'인바운드/건',data:iC,backgroundColor:C.redA,borderRadius:3,yAxisID:'y'},{label:'아웃바운드/매출',data:oR,backgroundColor:C.yellowA,borderRadius:3,yAxisID:'y1'},{label:'인바운드/매출',data:iR,backgroundColor:C.greenA,borderRadius:3,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:12}}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{position:'left',grid:gridOpt,ticks:tickOpt},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,callback:v=>v.toLocaleString('ko-KR')+'원'}}}}});
   const tC=oC.map((v,i)=>v+iC[i]);
   const wC=[3,7,0,5,4,5,4,0,2,0,35,5,3,8,3,6,3,3,3,4,3,1];
   const cvC=tC.map((t,i)=>t>0?parseFloat((wC[i]/t*100).toFixed(1)):0);
@@ -354,7 +360,7 @@ function renderWeekly(){
 function renderMonthly(){
   const oC=[521,71,76,151,651],iC=[5,32,37,39,18];
   const oR=[114457410,23552000,33457250,39694950,27915351],iR=[974000,11024000,11559000,12848000,3838000];
-  mc('chartMonthly',{type:'bar',data:{labels:MONTHS,datasets:[{label:'아웃바운드/건',data:oC,backgroundColor:C.blueA,borderRadius:4,yAxisID:'y'},{label:'인바운드/건',data:iC,backgroundColor:C.redA,borderRadius:4,yAxisID:'y'},{label:'아웃바운드/매출',data:oR,backgroundColor:C.yellowA,borderRadius:4,yAxisID:'y1',hidden:true},{label:'인바운드/매출',data:iR,backgroundColor:C.greenA,borderRadius:4,yAxisID:'y1',hidden:true}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:12}}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{position:'left',grid:gridOpt,ticks:tickOpt},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v}}}}});
+  mc('chartMonthly',{type:'bar',data:{labels:MONTHS,datasets:[{label:'아웃바운드/건',data:oC,backgroundColor:C.blueA,borderRadius:4,yAxisID:'y'},{label:'인바운드/건',data:iC,backgroundColor:C.redA,borderRadius:4,yAxisID:'y'},{label:'아웃바운드/매출',data:oR,backgroundColor:C.yellowA,borderRadius:4,yAxisID:'y1'},{label:'인바운드/매출',data:iR,backgroundColor:C.greenA,borderRadius:4,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:12}}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{position:'left',grid:gridOpt,ticks:tickOpt},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,callback:v=>v.toLocaleString('ko-KR')+'원'}}}}});
   const t=[526,103,113,190,669],w=[19,11,51,18,8];
   const cv=t.map((v,i)=>v>0?parseFloat((w[i]/v*100).toFixed(1)):0);
   mc('chartMonthlyConvCount',{type:'bar',data:{labels:MONTHS,datasets:[{label:'리드건 총합/건',data:t,backgroundColor:C.blueA,borderRadius:4,yAxisID:'y'},{label:'계약확정 총합/건',data:w,backgroundColor:C.redA,borderRadius:4,yAxisID:'y'},{label:'전체 건수 전환율',data:cv,type:'line',borderColor:C.yellow,pointBackgroundColor:C.yellow,borderWidth:2,pointRadius:5,tension:0.3,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:10}}},scales:{x:{grid:gridOpt,ticks:tickOpt},...dualAxis()}}});
@@ -393,9 +399,9 @@ function renderRetap(){
 
 function renderManager(){
   mc('chartMgrState',{type:'bar',data:{labels:MGRS5,datasets:[{label:'계약성사',data:[9,18,35,32,1],backgroundColor:C.yellow,borderRadius:3},{label:'단순방문',data:[138,119,99,96,108],backgroundColor:C.blue,borderRadius:3},{label:'유효리드',data:[165,232,326,135,131],backgroundColor:C.green,borderRadius:3},{label:'최종불발',data:[27,7,6,0,4],backgroundColor:C.red,borderRadius:3},{label:'전환율',data:[2.64,4.81,7.51,12.12,0.41],type:'line',borderColor:C.yellow,borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:8}}},scales:{x:{grid:gridOpt,ticks:tickOpt},...dualAxis('건수','전환율%')}}});
-  mc('chartMgrRev',{type:'bar',data:{labels:MGRS5,datasets:[{label:'계약성사',data:[2983900,3245000,2970400,13663580,995050],backgroundColor:C.yellow,borderRadius:3},{label:'유효리드',data:[59409275,48111230,43213100,32799250,46135955],backgroundColor:C.green,borderRadius:3},{label:'최종불발',data:[960000,50000,132000,0,120000],backgroundColor:C.red,borderRadius:3},{label:'전환율',data:[25.64,7.79,1.90,28.05,28.27],type:'line',borderColor:C.yellow,borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:8}}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{position:'left',grid:gridOpt,ticks:{...tickOpt,callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,callback:v=>v+'%'}}}}});
+  mc('chartMgrRev',{type:'bar',data:{labels:MGRS5,datasets:[{label:'계약성사',data:[2983900,3245000,2970400,13663580,995050],backgroundColor:C.yellow,borderRadius:3},{label:'유효리드',data:[59409275,48111230,43213100,32799250,46135955],backgroundColor:C.green,borderRadius:3},{label:'최종불발',data:[960000,50000,132000,0,120000],backgroundColor:C.red,borderRadius:3},{label:'전환율',data:[25.64,7.79,1.90,28.05,28.27],type:'line',borderColor:C.yellow,borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:8}}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{position:'left',grid:gridOpt,ticks:{...tickOpt,callback:v=>v.toLocaleString('ko-KR')+'원'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,callback:v=>v+'%'}}}}});
   mc('chartMgrInout',{type:'bar',data:{labels:MGRS5,datasets:[{label:'아웃바운드',data:[297,329,368,239,237],backgroundColor:C.blue,borderRadius:3},{label:'인바운드',data:[44,45,19,19,4],backgroundColor:C.red,borderRadius:3},{label:'전체 건수 전환율',data:[9.64,4.61,13.51,12.24,0.52],type:'line',borderColor:C.yellow,borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:8}}},scales:{x:{grid:gridOpt,ticks:tickOpt},...dualAxis('건수','전환율%')}}});
-  mc('chartMgrInoutRev',{type:'bar',data:{labels:MGRS5,datasets:[{label:'아웃바운드 예상매출',data:[45473426,38008730,58318500,40438500,46017455],backgroundColor:C.blue,borderRadius:3},{label:'인바운드 예상매출',data:[14259000,5682500,2516500,5682500,1013500],backgroundColor:C.red,borderRadius:3},{label:'전체 매출 전환율',data:[31.75,10.81,0,31.75,28.27],type:'line',borderColor:C.yellow,borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:8}}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{position:'left',grid:gridOpt,ticks:{...tickOpt,callback:v=>v>=1e6?(v/1e6).toFixed(0)+'M':v}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,callback:v=>v+'%'}}}}});
+  mc('chartMgrInoutRev',{type:'bar',data:{labels:MGRS5,datasets:[{label:'아웃바운드 예상매출',data:[45473426,38008730,58318500,40438500,46017455],backgroundColor:C.blue,borderRadius:3},{label:'인바운드 예상매출',data:[14259000,5682500,2516500,5682500,1013500],backgroundColor:C.red,borderRadius:3},{label:'전체 매출 전환율',data:[31.75,10.81,0,31.75,28.27],type:'line',borderColor:C.yellow,borderWidth:2,pointRadius:4,tension:0.3,yAxisID:'y1'}]},options:{responsive:true,plugins:{legend:{labels:{color:'#64748b',boxWidth:10,padding:8}}},scales:{x:{grid:gridOpt,ticks:tickOpt},y:{position:'left',grid:gridOpt,ticks:{...tickOpt,callback:v=>v.toLocaleString('ko-KR')+'원'}},y1:{position:'right',grid:{drawOnChartArea:false},ticks:{...tickOpt,callback:v=>v+'%'}}}}});
 }
 
 const DD={'고의준':{mc:{w:[3,1,1,3,1],v:[37,0,34,40,27],vl:[0,0,0,0,140],cv:[19.0,12.5,4.88,12.5,0.68]},wc:{w:[1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,0,0,0,0,0,1,1],v:[3,11,2,5,3,4,2,0,1,0,7,2,3,2,0,2,1,1,4,18,11,10],vl:[15,11,2,11,7,5,3,1,3,1,15,5,5,5,3,8,5,5,15,46,30,37],cv:[5,0,0,7.7,9.1,0,0,0,0,0,5.3,0,0,9.1,0,0,0,0,0,0,2.9,2.6]},mi:{i:[2,28,13,26,10],o:[27,0,34,114,5],cv:[5.17,3.57,2.13,7.14,6.25]},wi:{i:[2,2,0,2,2,0,2,0,0,0,2,0,0,2,0,2,0,0,2,5,2,2],o:[18,8,4,14,9,9,3,1,4,1,20,7,8,5,3,6,6,6,17,60,40,46],cv:[5,0,0,7.7,9.1,0,0,0,0,0,4.5,0,0,9.1,0,0,0,0,0,0,2.4,2.1]}},'조용빈':{mc:{w:[5,3,5,4,1],v:[20,15,22,35,27],vl:[40,50,60,80,2],cv:[10.2,5.3,8.1,4.3,1.8]},wc:{w:[0,1,0,1,1,0,0,0,1,0,1,0,0,0,0,1,1,0,0,0,0,1],v:[4,5,3,6,3,4,2,0,1,0,3,2,5,2,0,3,1,1,2,8,5,6],vl:[8,12,5,14,7,4,3,2,5,2,8,3,5,5,4,10,6,5,12,20,15,18],cv:[3,5,0,4.8,7.3,0,0,0,5.9,0,5.3,0,0,0,0,0,4.8,0,0,0,0,2.6]},mi:{i:[5,10,8,15,7],o:[55,45,72,115,107],cv:[6.3,4.7,5.5,5.1,1.2]},wi:{i:[2,1,1,3,2,0,1,0,0,0,3,0,0,2,0,1,0,0,2,4,2,3],o:[22,15,12,28,18,14,8,2,6,2,11,5,10,7,4,13,8,7,22,46,30,35],cv:[3.6,3.8,0,8.2,7.5,0,0,0,0,0,9.1,0,0,0,0,3.6,3.1,0,0,0,0,2.6]}},'박철용':{mc:{w:[3,11,18,1,2],v:[0,0,0,8,91],vl:[40,50,60,120,56],cv:[6.5,18.0,23.1,0.8,2.3]},wc:{w:[1,2,0,1,0,1,1,0,0,0,5,1,1,2,0,1,1,0,1,1,0,0],v:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,4,25,41,21],vl:[12,22,8,20,8,7,5,1,5,2,15,6,8,8,3,12,7,5,18,55,30,20],cv:[5,8.3,0,4.8,0,7.1,6.3,0,0,0,25,6.3,7.7,14.3,0,6.3,6.7,0,4.5,1.5,0,0]},mi:{i:[0,12,15,22,5],o:[43,68,95,120,135],cv:[6.5,15.0,17.4,0.7,1.5]},wi:{i:[0,1,0,2,1,0,1,0,0,0,2,0,0,1,0,1,0,0,2,3,2,3],o:[13,22,8,22,7,8,6,1,5,2,18,7,9,9,3,13,8,5,20,77,69,38],cv:[5,8.7,0,4.3,0,7.1,6.3,0,0,0,25,6.3,7.7,14.3,0,6.3,6.7,0,4.4,1.2,0,0]}},'이병현':{mc:{w:[2,8,15,6,1],v:[0,0,0,48,48],vl:[22,35,55,62,24],cv:[8.3,18.6,21.4,5.3,2.1]},wc:{w:[0,1,0,1,1,0,0,0,0,0,3,1,1,2,0,1,1,0,1,0,0,0],v:[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,15,21,10],vl:[5,10,4,12,6,5,3,1,3,1,8,4,5,6,2,8,4,3,10,25,12,7],cv:[0,5.9,0,6.3,9.1,0,0,0,0,0,18.8,11.1,9.1,15.4,0,8.3,11.1,0,7.7,0,0,0]},mi:{i:[2,5,10,18,3],o:[22,38,60,68,59],cv:[8.3,18.6,17.1,5.3,1.7]},wi:{i:[1,0,0,1,1,0,0,0,0,0,1,0,0,1,0,1,0,0,1,2,2,1],o:[4,11,4,13,6,5,3,1,3,1,10,5,6,7,2,9,5,3,11,38,31,16],cv:[0,5.9,0,6.3,9.1,0,0,0,0,0,18.8,11.1,9.1,15.4,0,8.3,11.1,0,7.7,0,0,0]}}};
