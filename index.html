@@ -441,7 +441,7 @@ async function loadData() {
     renderAllCharts(); return;
   }
   try {
-    const res=await fetch(APPS_SCRIPT_URL);
+    const res=await fetch(APPS_SCRIPT_URL, {redirect: 'follow'});
     RAW=await res.json(); FILTERED=[...RAW];
     document.getElementById('dataStatus').textContent=`${RAW.length.toLocaleString()}행 로드 완료`;
     document.getElementById('lastUpd').textContent=new Date().toLocaleString('ko-KR');
