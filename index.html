@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UpBox 로컬영업팀 대시보드 2026</title>
+<title>UpBox 로컬영업팀 리드건 대시보드 2026</title>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
@@ -435,7 +435,7 @@ const APPS_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbzpvF_bPc-wET-o
 let RAW=[], FILTERED=[];
 async function loadData() {
   document.getElementById('dataStatus').textContent='데이터 로딩 중...';
-  if(APPS_SCRIPT_URL==='https://script.google.com/macros/s/AKfycbzpvF_bPc-wET-orrhz4BLV75bXEoz0ngbu-2q2qnz62uAxhv0kbAGpIcWfpr5Egm6STA/exec'){
+  if(APPS_SCRIPT_URL==='YOUR_APPS_SCRIPT_URL'){
     document.getElementById('dataStatus').textContent='시연 모드 (샘플 데이터)';
     document.getElementById('lastUpd').textContent=new Date().toLocaleDateString('ko-KR');
     renderAllCharts(); return;
